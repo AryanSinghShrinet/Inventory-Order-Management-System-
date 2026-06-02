@@ -10,6 +10,13 @@ from app.config import get_settings
 
 settings = get_settings()
 engine_url = make_url(settings.database_url)
+
+# Ensure PostgreSQL URLs use the psycopg driver (not psycopg2)
+database_url = settings.database_url
+if engine_url.drivername == "postgresql":
+    # Convert "postgresql://" to "postgresql+psycopg://"
+    database_url = database_url.replace("postgresql://", "postgresql+psycopg://")
+
 engine_kwargs = {
     "pool_pre_ping": True,
     "future": True,
@@ -21,7 +28,7 @@ if not engine_url.drivername.startswith("sqlite"):
         max_overflow=10,
     )
 
-engine = create_engine(settings.database_url, **engine_kwargs)
+engine = create_engine(database_url, **engine_kwargs)
 
 SessionLocal = sessionmaker(
     bind=engine,
