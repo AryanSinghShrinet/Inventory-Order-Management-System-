@@ -21,13 +21,12 @@ services:
   - type: web
     name: inventory-backend
     runtime: docker
-    rootDir: backend
     plan: free
     region: oregon
     healthCheckPath: /healthz
     autoDeploy: true
     dockerContext: backend
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: backend/Dockerfile
     envVars:
       - key: DATABASE_URL
         fromDatabase:
