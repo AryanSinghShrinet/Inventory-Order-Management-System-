@@ -5,6 +5,7 @@ from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
+from sqlalchemy.engine import make_url
 
 from app.config import get_settings
 from app.database import Base
@@ -17,6 +18,12 @@ if config.config_file_name is not None:
 
 # Override URL from environment if available.
 db_url = os.getenv("DATABASE_URL") or get_settings().database_url
+
+# Ensure PostgreSQL URLs use the psycopg driver (not psycopg2)
+url_obj = make_url(db_url)
+if url_obj.drivername == "postgresql":
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg://")
+
 config.set_main_option("sqlalchemy.url", db_url)
 
 target_metadata = Base.metadata
